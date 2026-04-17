@@ -183,12 +183,31 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
-                    @if($kategoris->hasPages())
-                        <div class="mt-4">
-                            {{ $kategoris->links() }}
+
+                        <!-- Row Filter Section -->
+                        <div class="border-t border-slate-100 bg-slate-50/50 px-8 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold text-slate-600">Tampilkan:</span>
+                                @php
+                                    $currentPerPage = request()->query('per_page', 5);
+                                @endphp
+                                <select onchange="window.location.href='{{ route('admin.kategoris.index') }}?per_page=' + this.value" 
+                                        class="px-6 py-1.5 pr-10 rounded-lg text-sm font-semibold border border-slate-200 bg-white text-slate-600 focus:border-indigo-500 focus:ring-indigo-500 cursor-pointer appearance-none bg-no-repeat bg-right"
+                                        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22></path></svg>'); background-position: right 8px center; background-size: 20px;">
+                                    <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                    <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                    <option value="15" {{ $currentPerPage == 15 ? 'selected' : '' }}>15</option>
+                                    <option value="20" {{ $currentPerPage == 20 ? 'selected' : '' }}>20</option>
+                                </select>
+                                <span class="text-sm text-slate-500">Baris</span>
+                            </div>
+                            @if($kategoris->hasPages())
+                                <div class="flex items-center gap-4 pl-8">
+                                    {{ $kategoris->appends(request()->query())->links() }}
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </main>
 
                 {{-- MODAL ADD --}}

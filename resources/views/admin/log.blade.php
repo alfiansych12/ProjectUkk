@@ -123,48 +123,66 @@
                 </header>
 
                 <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none p-4 md:p-8">
-                    <div class="mb-8">
-                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                            {{ __('Log Aktivitas Sistem') }}
-                        </h2>
+                    <div class="mb-10 flex items-end justify-between">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Log Aktivitas Sistem</h2>
+                            <p class="text-slate-400 text-sm mt-1 font-medium">Riwayat aktivitas dan perubahan di sistem.</p>
+                        </div>
                     </div>
 
-                    <div class="py-12">
-                        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                            <div class="glass-card overflow-hidden">
-                                <table class="w-full text-left">
-                                    <thead>
-                                        <tr class="bg-slate-50 border-b border-slate-100">
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Waktu</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">User</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Aktivitas</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Deskripsi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        @foreach($logs as $log)
-                                            <tr class="hover:bg-slate-50/50">
-                                                <td class="px-6 py-4 text-xs text-slate-500">{{ $log->created_at->format('d/m/Y H:i') }}</td>
-                                                <td class="px-6 py-4">
-                                                    <div class="font-bold text-slate-800 text-sm">{{ $log->user->name ?? 'System' }}</div>
-                                                    <div class="text-[10px] text-slate-400">{{ $log->user->role ?? '-' }}</div>
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase
-                                                        {{ str_contains(strtolower($log->aktivitas), 'hapus') ? 'bg-red-100 text-red-700' : 
-                                                           (str_contains(strtolower($log->aktivitas), 'tambah') ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700') }}">
-                                                        {{ $log->aktivitas }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-6 py-4 text-xs text-slate-600 leading-relaxed">{{ $log->deskripsi }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                    <div class="glass-card overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-50/50 border-b border-slate-100">
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Waktu</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">User</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Aktivitas</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Deskripsi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                @foreach($logs as $log)
+                                    <tr class="group hover:bg-slate-50/30 transition-colors">
+                                        <td class="px-8 py-6 text-sm font-bold text-slate-500">{{ $log->created_at->format('d/m/Y H:i') }}</td>
+                                        <td class="px-8 py-6">
+                                            <div class="font-black text-slate-800 text-sm tracking-tight">{{ $log->user->name ?? 'System' }}</div>
+                                            <div class="text-[10px] font-bold text-slate-400 uppercase">{{ $log->user->role ?? '-' }}</div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest
+                                                {{ str_contains(strtolower($log->aktivitas), 'hapus') ? 'bg-red-50 text-red-700 ring-1 ring-red-100' : 
+                                                   (str_contains(strtolower($log->aktivitas), 'tambah') ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100' : 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100') }}">
+                                                {{ $log->aktivitas }}
+                                            </span>
+                                        </td>
+                                        <td class="px-8 py-6 text-sm font-bold text-slate-600 leading-relaxed">{{ $log->deskripsi }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        <!-- Row Filter Section -->
+                        <div class="border-t border-slate-100 bg-slate-50/50 px-8 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold text-slate-600">Tampilkan:</span>
+                                @php
+                                    $currentPerPage = request()->query('per_page', 5);
+                                @endphp
+                                <select onchange="window.location.href='{{ route('admin.logs.index') }}?per_page=' + this.value" 
+                                        class="px-6 py-1.5 pr-10 rounded-lg text-sm font-semibold border border-slate-200 bg-white text-slate-600 focus:border-indigo-500 focus:ring-indigo-500 cursor-pointer appearance-none bg-no-repeat bg-right"
+                                        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22></path></svg>'); background-position: right 8px center; background-size: 20px;">
+                                    <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                    <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                    <option value="15" {{ $currentPerPage == 15 ? 'selected' : '' }}>15</option>
+                                    <option value="20" {{ $currentPerPage == 20 ? 'selected' : '' }}>20</option>
+                                </select>
+                                <span class="text-sm text-slate-500">Baris</span>
                             </div>
-                            <div class="mt-4">
-                                {{ $logs->links() }}
-                            </div>
+                            @if($logs->hasPages())
+                                <div class="flex items-center gap-4 pl-8">
+                                    {{ $logs->appends(request()->query())->links() }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </main>

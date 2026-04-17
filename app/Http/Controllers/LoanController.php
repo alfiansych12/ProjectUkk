@@ -24,12 +24,19 @@ class LoanController extends Controller
     }
 
     // List for Admin/Petugas
-    public function manage()
+    public function manage(Request $request)
     {
+        $perPage = $request->query('per_page', 5);
+        $allowedPerPage = [5, 10, 15, 20];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+        
         $loans = Peminjaman::with(['alat', 'user'])
             ->orderByRaw("status = 'pending' DESC, status = 'menunggu_pengembalian' DESC")
             ->latest()
-            ->paginate(15);
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage]);
 
         $users = \App\Models\User::where('role', 'peminjam')->get();
         $alats = Alat::where('stok', '>', 0)->get();
@@ -75,7 +82,19 @@ class LoanController extends Controller
     {
         $request->validate([
             'borrower_name' => 'required|string|max:191',
-            'borrower_whatsapp' => ['required', 'string', 'regex:/^\+?[0-9\s\-]{8,20}$/'],
+            'borrower_whatsapp' => [
+                'required', 
+                'string', 
+                'regex:/^\+?[0-9\s\-]{8,20}$/',
+                function ($attribute, $value, $fail) {
+                    $whatsapp = $this->formatWhatsApp($value);
+                    // Check if this number is already registered as a user
+                    $existsAsUser = \App\Models\User::where('phone', $whatsapp)->exists();
+                    if ($existsAsUser) {
+                        $fail('Nomor WhatsApp ini sudah terdaftar sebagai user. Gunakan fitur peminjaman untuk user yang sudah terdaftar.');
+                    }
+                }
+            ],
             'otp_code' => 'required|string|digits:6',
             'alat_id' => 'required|exists:alats,id',
             'tgl_pinjam' => 'required|date',
@@ -134,7 +153,19 @@ class LoanController extends Controller
     public function sendOfflineOtp(Request $request)
     {
         $request->validate([
-            'borrower_whatsapp' => ['required', 'string', 'regex:/^\+?[0-9\s\-]{8,20}$/'],
+            'borrower_whatsapp' => [
+                'required', 
+                'string', 
+                'regex:/^\+?[0-9\s\-]{8,20}$/',
+                function ($attribute, $value, $fail) {
+                    $whatsapp = $this->formatWhatsApp($value);
+                    // Check if this number is already registered as a user
+                    $existsAsUser = \App\Models\User::where('phone', $whatsapp)->exists();
+                    if ($existsAsUser) {
+                        $fail('Nomor WhatsApp ini sudah terdaftar sebagai user. Gunakan fitur peminjaman untuk user yang sudah terdaftar.');
+                    }
+                }
+            ],
         ]);
 
         $token = env('FONNTE_TOKEN');

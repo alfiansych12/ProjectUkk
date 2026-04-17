@@ -16,23 +16,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
-
     // Admin Routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         // Safe Redirects for modal-based workflow
         Route::get('users/create', fn() => redirect()->route('admin.users.index'));
         Route::get('users/{user}', fn() => redirect()->route('admin.users.index'));
         Route::get('users/{user}/edit', fn() => redirect()->route('admin.users.index'));
-        
+
         Route::get('alats/create', fn() => redirect()->route('admin.alats.index'));
         Route::get('alats/{alat}', fn() => redirect()->route('admin.alats.index'));
         Route::get('alats/{alat}/edit', fn() => redirect()->route('admin.alats.index'));
-        
+
         Route::get('kategoris/create', fn() => redirect()->route('admin.kategoris.index'));
         Route::get('kategoris/{kategori}', fn() => redirect()->route('admin.kategoris.index'));
         Route::get('kategoris/{kategori}/edit', fn() => redirect()->route('admin.kategoris.index'));
-        
+
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['create', 'edit', 'show']);
         Route::resource('alats', \App\Http\Controllers\Admin\AlatController::class)->except(['create', 'edit', 'show']);
         Route::resource('kategoris', \App\Http\Controllers\Admin\KategoriController::class)->except(['create', 'edit', 'show']);
@@ -54,11 +52,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Peminjam Routes
     Route::middleware('role:peminjam')->group(function () {
-        Route::get('alats', [\App\Http\Controllers\Admin\AlatController::class, 'index'])->name('alats.index');
-        Route::get('my-loans', [\App\Http\Controllers\LoanController::class, 'index'])->name('loans.index');
         Route::post('loans/request', [\App\Http\Controllers\LoanController::class, 'store'])->name('loans.store');
         Route::post('loans/{loan}/request-return', [\App\Http\Controllers\LoanController::class, 'requestReturn'])->name('loans.requestReturn');
     });
+
+    // Semua user yang login (admin, petugas, peminjam) bisa akses alats dan my-loans
+    Route::middleware('auth')->group(function () {
+        Route::get('alats', [\App\Http\Controllers\Admin\AlatController::class, 'index'])->name('alats.index');
+        Route::get('my-loans', [\App\Http\Controllers\LoanController::class, 'index'])->name('loans.index');
+    });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

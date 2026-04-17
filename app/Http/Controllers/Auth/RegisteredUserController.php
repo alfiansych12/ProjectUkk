@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\FormatPhoneTrait;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    use FormatPhoneTrait;
     /**
      * Display the registration view.
      */
@@ -75,8 +77,11 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string', 'regex:/^\+?[0-9\s\-]{8,20}$/'],
         ]);
 
+        // Format nomor terlebih dahulu sebelum cek
+        $whatsapp = $this->formatWhatsApp($request->phone);
+
         // Check if phone already exists
-        if (User::where('phone', $request->phone)->exists()) {
+        if (User::where('phone', $whatsapp)->exists()) {
             return response()->json(['message' => 'Nomor WhatsApp sudah terdaftar.'], 422);
         }
 
@@ -86,7 +91,6 @@ class RegisteredUserController extends Controller
         }
 
         $otp = (string) random_int(100000, 999999);
-        $whatsapp = $this->formatWhatsApp($request->phone);
 
         try {
             session(["register_otp.{$whatsapp}" => $otp]);
@@ -117,18 +121,5 @@ class RegisteredUserController extends Controller
             \Log::error('Fonnte OTP Registration Error', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
         }
-    }
-
-    private function formatWhatsApp($number)
-    {
-        $whatsapp = preg_replace('/\D+/', '', $number);
-        if (str_starts_with($whatsapp, '0')) {
-            $whatsapp = '62' . substr($whatsapp, 1);
-        } elseif (str_starts_with($whatsapp, '620')) {
-            $whatsapp = '62' . substr($whatsapp, 3);
-        } elseif (!str_starts_with($whatsapp, '62')) {
-            $whatsapp = '62' . $whatsapp;
-        }
-        return $whatsapp;
     }
 }

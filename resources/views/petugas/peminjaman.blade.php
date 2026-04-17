@@ -319,17 +319,37 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
 
-                <div class="mt-8">
-                    {{ $loans->links() }}
+                    <!-- Row Filter Section -->
+                    <div class="border-t border-slate-100 bg-slate-50/50 px-8 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-semibold text-slate-600">Tampilkan:</span>
+                            @php
+                                $currentPerPage = request()->query('per_page', 5);
+                            @endphp
+                            <select onchange="window.location.href='{{ route('loans.manage') }}?per_page=' + this.value" 
+                                    class="px-6 py-1.5 pr-10 rounded-lg text-sm font-semibold border border-slate-200 bg-white text-slate-600 focus:border-indigo-500 focus:ring-indigo-500 cursor-pointer appearance-none bg-no-repeat bg-right"
+                                    style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22></path></svg>'); background-position: right 8px center; background-size: 20px;">
+                                <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                <option value="15" {{ $currentPerPage == 15 ? 'selected' : '' }}>15</option>
+                                <option value="20" {{ $currentPerPage == 20 ? 'selected' : '' }}>20</option>
+                            </select>
+                            <span class="text-sm text-slate-500">Baris</span>
+                        </div>
+                        @if($loans->hasPages())
+                            <div class="flex items-center gap-4 pl-8">
+                                {{ $loans->appends(request()->query())->links() }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- MODAL OFFLINE LOAN --}}
                 <template x-if="offlineModal">
                     <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="offlineModal = false"></div>
-                        <div class="relative w-full max-w-lg bg-white rounded-3xl p-8 shadow-2xl animate-in zoom-in duration-200">
+                        <div class="relative w-full max-w-4xl bg-white rounded-3xl p-8 shadow-2xl animate-in zoom-in duration-200">
                             <div class="flex justify-between items-center mb-6">
                                 <h3 class="text-xl font-black text-slate-800 tracking-tight">Peminjaman Offline</h3>
                                 <button @click="offlineModal = false" class="text-slate-400 hover:text-slate-600">
@@ -337,64 +357,76 @@
                                 </button>
                             </div>
 
-                            <form action="{{ route('loans.storeOffline') }}" method="POST" class="space-y-5">
+                            <form action="{{ route('loans.storeOffline') }}" method="POST" class="space-y-4">
                                 @csrf
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nama Peminjam</label>
-                                    <input type="text" name="borrower_name" required placeholder="Nama lengkap peminjam"
-                                        class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nomor WhatsApp</label>
-                                    <div class="flex gap-3">
-                                        <input x-model="borrowerWhatsapp" type="tel" name="borrower_whatsapp" required placeholder="+628..."
-                                            class="flex-1 rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500">
-                                        <button type="button" @click="sendOfflineOtp()"
-                                            class="px-4 py-3 bg-indigo-600 text-white font-black text-sm rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 uppercase tracking-[0.2em]">
-                                            Kirim OTP
-                                        </button>
+                                
+                                <!-- Row 1: Nama Peminjam & Nomor WhatsApp -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nama Peminjam</label>
+                                        <input type="text" name="borrower_name" required placeholder="Nama lengkap peminjam"
+                                            class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
                                     </div>
-                                    <p x-text="otpMessage" class="mt-2 text-sm" :class="otpStatus === 'error' ? 'text-rose-600' : 'text-emerald-600'"></p>
-                                    <p class="mt-2 text-[10px] text-slate-400 italic">Gunakan kode OTP untuk memverifikasi nomor WhatsApp peminjam.</p>
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nomor WhatsApp</label>
+                                        <div class="flex gap-2">
+                                            <input x-model="borrowerWhatsapp" type="tel" name="borrower_whatsapp" required placeholder="+628..."
+                                                class="flex-1 rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                            <button type="button" @click="sendOfflineOtp()"
+                                                class="px-3 py-2 bg-indigo-600 text-white font-black text-xs rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 uppercase tracking-widest whitespace-nowrap">
+                                                Kirim OTP
+                                            </button>
+                                        </div>
+                                        <p x-text="otpMessage" class="mt-1.5 text-xs" :class="otpStatus === 'error' ? 'text-rose-600' : 'text-emerald-600'"></p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Kode OTP</label>
-                                    <input type="text" name="otp_code" maxlength="6" required placeholder="Masukkan 6 digit OTP"
-                                        class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500">
+                                <!-- Row 2: OTP Message Info -->
+                                <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p class="text-[10px] text-slate-500 font-medium italic">Kode OTP telah dikirim ke WhatsApp. Gunakan kode OTP untuk memverifikasi nomor WhatsApp peminjam.</p>
                                 </div>
 
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Pilih Alat</label>
-                                    <select name="alat_id" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500">
-                                        @foreach($alats as $alat)
-                                            <option value="{{ $alat->id }}">
-                                                {{ $alat->nama_alat }} (Stok: {{ $alat->stok }}, Denda: Rp{{ number_format($alat->denda_per_hari, 0, ',', '.') }}/hari)
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                <!-- Row 3: Kode OTP & Pilih Alat -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Kode OTP</label>
+                                        <input type="text" name="otp_code" maxlength="6" required placeholder="Masukkan 6 digit"
+                                            class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-center tracking-widest">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Pilih Alat</label>
+                                        <select name="alat_id" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500 transition-all">
+                                            <option value="">-- Pilih Alat --</option>
+                                            @foreach($alats as $alat)
+                                                <option value="{{ $alat->id }}">
+                                                    {{ $alat->nama_alat }} (Stok: {{ $alat->stok }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
 
-                                <div class="grid grid-cols-2 gap-4">
+                                <!-- Row 4: Tgl Pinjam, Estimasi Kembali, Jumlah -->
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Tgl Pinjam</label>
-                                        <input type="date" name="tgl_pinjam" value="{{ date('Y-m-d') }}" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500">
+                                        <input type="date" name="tgl_pinjam" value="{{ date('Y-m-d') }}" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 transition-all">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Estimasi Kembali</label>
-                                        <input type="date" name="tgl_kembali_rencana" value="{{ date('Y-m-d', strtotime('+3 days')) }}" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500">
+                                        <input type="date" name="tgl_kembali_rencana" value="{{ date('Y-m-d', strtotime('+3 days')) }}" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Jumlah</label>
+                                        <input type="number" name="jumlah" value="1" min="1" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500 transition-all text-center">
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Jumlah</label>
-                                    <input type="number" name="jumlah" value="1" min="1" required class="w-full rounded-2xl border-slate-100 bg-slate-50 text-sm font-bold text-slate-700 focus:ring-indigo-500">
+                                <!-- Button -->
+                                <div class="flex gap-3 pt-2">
+                                    <button type="button" @click="offlineModal = false" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold text-xs rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest">Batal</button>
+                                    <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white font-black text-xs rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 uppercase tracking-widest">Simpan Transaksi</button>
                                 </div>
-
-                                <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-black text-sm rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 mt-4 uppercase tracking-[0.2em]">
-                                    Simpan Transaksi
-                                </button>
                             </form>
                         </div>
                     </div>

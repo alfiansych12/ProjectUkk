@@ -193,7 +193,73 @@
                     this.editPreviews.splice(i, 1);
                     document.getElementById('editFilesInput').files = dt.files;
                 },
-                removeExistingImage(i) { this.editData.images.splice(i, 1); }
+                removeExistingImage(i) { this.editData.images.splice(i, 1); },
+                
+                submitAddForm() {
+                    const form = document.getElementById('addAlatForm');
+                    const formData = new FormData(form);
+                    // Add files from the DataTransfer
+                    const fileInput = document.getElementById('addFilesInput');
+                    if (fileInput && fileInput.files.length > 0) {
+                        Array.from(fileInput.files).forEach(f => formData.append('images[]', f));
+                    }
+                    
+                    fetch('{{ route('admin.alats.store') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.errors) {
+                            alert('Error: ' + Object.values(data.errors).flat().join(', '));
+                        } else {
+                            this.addModal = false;
+                            this.addPreviews = [];
+                            this.addFiles = new DataTransfer();
+                            setTimeout(() => location.reload(), 300);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat menyimpan alat');
+                    });
+                },
+                
+                submitEditForm() {
+                    const form = document.getElementById('editAlatForm');
+                    const formData = new FormData(form);
+                    // Add new files
+                    const fileInput = document.getElementById('editFilesInput');
+                    if (fileInput && fileInput.files.length > 0) {
+                        Array.from(fileInput.files).forEach(f => formData.append('images[]', f));
+                    }
+                    // Add existing images
+                    formData.append('existing_images', JSON.stringify(this.editData.images));
+                    
+                    fetch('/admin/alats/' + this.editData.id, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.errors) {
+                            alert('Error: ' + Object.values(data.errors).flat().join(', '));
+                        } else {
+                            this.editModal = false;
+                            setTimeout(() => location.reload(), 300);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat memperbarui alat');
+                    });
+                }
             }">
             <!-- Mobile Top Nav -->
             <header class="lg:hidden bg-white border-b border-slate-100 p-4 flex justify-between items-center">
@@ -289,12 +355,31 @@
                             @endforeach
                         </tbody>
                     </table>
-                </div>
-                @if($alats->hasPages())
-                    <div class="mt-4">
-                        {{ $alats->links() }}
+
+                    <!-- Row Filter Section -->
+                    <div class="border-t border-slate-100 bg-slate-50/50 px-8 py-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-semibold text-slate-600">Tampilkan:</span>
+                            @php
+                                $currentPerPage = request()->query('per_page', 5);
+                            @endphp
+                            <select onchange="window.location.href='{{ route('admin.alats.index') }}?per_page=' + this.value + '{{ request()->has('kategori_id') ? '&kategori_id=' . request('kategori_id') : '' }}'" 
+                                    class="px-6 py-1.5 pr-10 rounded-lg text-sm font-semibold border border-slate-200 bg-white text-slate-600 focus:border-indigo-500 focus:ring-indigo-500 cursor-pointer appearance-none bg-no-repeat bg-right"
+                                    style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22></path></svg>'); background-position: right 8px center; background-size: 20px;">
+                                <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                <option value="15" {{ $currentPerPage == 15 ? 'selected' : '' }}>15</option>
+                                <option value="20" {{ $currentPerPage == 20 ? 'selected' : '' }}>20</option>
+                            </select>
+                            <span class="text-sm text-slate-500">Baris</span>
+                        </div>
+                        @if($alats->hasPages())
+                            <div class="flex items-center gap-4 pl-8">
+                                {{ $alats->appends(request()->query())->links() }}
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </main>
 
             {{-- MODAL ADD --}}
@@ -306,7 +391,7 @@
                         <!-- Left: Form -->
                         <div class="flex-1 min-w-0 p-8 border-r border-slate-100 overflow-y-auto custom-scrollbar">
                             <h3 class="text-xl font-bold text-slate-800 mb-6">Tambah Alat Baru</h3>
-                            <form action="{{ route('admin.alats.store') }}" method="POST" enctype="multipart/form-data"
+                            <form @submit.prevent="submitAddForm" action="{{ route('admin.alats.store') }}" method="POST" enctype="multipart/form-data"
                                 id="addAlatForm">
                                 @csrf
                                 <div class="space-y-4">
@@ -406,7 +491,7 @@
                     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="editModal = false"></div>
                     <div
                         class="relative w-full max-w-5xl bg-white rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in duration-200 flex min-h-[500px] max-h-[90vh]">
-                        <form :action="'/admin/alats/' + editData.id" method="POST" enctype="multipart/form-data"
+                        <form @submit.prevent="submitEditForm" :action="'/admin/alats/' + editData.id" method="POST" enctype="multipart/form-data"
                             id="editAlatForm" class="flex w-full">
                             @csrf @method('PUT')
                             <!-- Left: Form -->

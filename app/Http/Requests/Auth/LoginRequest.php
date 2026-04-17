@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Traits\FormatPhoneTrait;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    use FormatPhoneTrait;
     public function authorize(): bool
     {
         return true;
@@ -51,19 +53,6 @@ class LoginRequest extends FormRequest
 
         Auth::login($user, $this->boolean('remember'));
         RateLimiter::clear($this->throttleKey());
-    }
-
-    private function formatWhatsApp($number)
-    {
-        $whatsapp = preg_replace('/\D+/', '', $number);
-        if (str_starts_with($whatsapp, '0')) {
-            $whatsapp = '62' . substr($whatsapp, 1);
-        } elseif (str_starts_with($whatsapp, '620')) {
-            $whatsapp = '62' . substr($whatsapp, 3);
-        } elseif (!str_starts_with($whatsapp, '62')) {
-            $whatsapp = '62' . $whatsapp;
-        }
-        return $whatsapp;
     }
 
     public function ensureIsNotRateLimited(): void

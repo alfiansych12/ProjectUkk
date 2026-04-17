@@ -8,12 +8,19 @@ use Illuminate\Http\Request;
 
 class KategoriController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->query('per_page', 5);
+        $allowedPerPage = [5, 10, 15, 20];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+        
         $kategoris = Kategori::withCount('alats')
             ->withSum('alats', 'stok')
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage)
+            ->appends(['per_page' => $perPage]);
             
         return view('admin.kategori', compact('kategoris'));
     }

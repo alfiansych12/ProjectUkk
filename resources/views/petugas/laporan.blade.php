@@ -88,7 +88,7 @@
                     @endif
                 </nav>
 
-                <div class="pt-6 border-t border-slate-50">
+                <div class="pt-6 border-t border-slate-50 space-y-4">
                     <div class="glass-card p-4 flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700">
                             {{ substr(Auth::user()->name, 0, 1) }}
@@ -98,6 +98,16 @@
                             <div class="text-[10px] font-bold text-slate-400 uppercase">{{ Auth::user()->role }}</div>
                         </div>
                     </div>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-2xl transition-all duration-200 group">
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span class="font-bold text-sm">Keluar</span>
+                        </button>
+                    </form>
                 </div>
             </aside>
 
@@ -123,66 +133,98 @@
                 </header>
 
                 <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none p-4 md:p-8">
-                    <div class="mb-8">
-                        <div class="flex justify-between items-center">
-                            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                                {{ __('Laporan Peminjaman') }}
-                            </h2>
-                            <button onclick="window.print()" class="btn-primary">
-                                Print Laporan
-                            </button>
+                    <div class="mb-10 flex items-end justify-between">
+                        <div>
+                            <a href="{{ route('loans.manage') }}" class="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 font-bold text-sm rounded-xl hover:bg-slate-200 transition-all mb-4 w-fit">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Kembali
+                            </a>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Laporan Peminjaman</h2>
+                            <p class="text-slate-400 text-sm mt-1 font-medium">Ringkasan data peminjaman dan pengembalian alat.</p>
                         </div>
+                        <button onclick="window.print()" class="px-6 py-3 bg-indigo-600 text-white font-bold text-sm rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                            Print Laporan
+                        </button>
                     </div>
 
-                    <div class="py-12">
-                        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                            <div class="glass-card overflow-hidden">
-                                <table class="w-full text-left">
-                                    <thead>
-                                        <tr class="bg-slate-50 border-b border-slate-100">
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Peminjam</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Alat</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Tgl Pinjam</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Tgl Kembali</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Denda</th>
-                                            <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        @foreach($loans as $loan)
-                                            <tr class="hover:bg-slate-50/50">
-                                                <td class="px-6 py-4">
-                                                    <div class="font-bold text-slate-800 text-sm">{{ $loan->user->name }}</div>
-                                                </td>
-                                                <td class="px-6 py-4 text-sm text-slate-600">
-                                                    {{ $loan->alat->nama_alat }} ({{ $loan->jumlah }})
-                                                </td>
-                                                <td class="px-6 py-4 text-xs text-slate-500">
-                                                    {{ \Carbon\Carbon::parse($loan->tgl_pinjam)->format('d/m/Y') }}
-                                                </td>
-                                                <td class="px-6 py-4 text-xs text-slate-500">
-                                                    {{ $loan->tgl_kembali_real ? \Carbon\Carbon::parse($loan->tgl_kembali_real)->format('d/m/Y') : '-' }}
-                                                </td>
-                                                <td class="px-6 py-4 font-bold text-rose-600 text-sm">
-                                                    Rp{{ number_format($loan->denda, 0, ',', '.') }}
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    <span class="px-2 py-1 rounded text-[10px] font-black uppercase
-                                                        {{ $loan->status == 'borrowed' ? 'bg-indigo-100 text-indigo-700' : '' }}
-                                                        {{ $loan->status == 'returned' ? 'bg-emerald-100 text-emerald-700' : '' }}
-                                                    ">
-                                                        {{ $loan->status }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="mt-4 no-print">
-                                {{ $loans->links() }}
-                            </div>
-                        </div>
+                    <div class="glass-card overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/50 border-b border-slate-100">
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Peminjam</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Alat & Jumlah</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tgl Pinjam</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tgl Kembali</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Denda</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                @forelse($loans as $loan)
+                                    <tr class="hover:bg-slate-50/30 transition-colors group">
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-black text-indigo-600 text-xs">
+                                                    {{ substr($loan->user->name ?? 'U', 0, 1) }}
+                                                </div>
+                                                <div>
+                                                    <div class="font-black text-slate-800 text-sm">{{ $loan->user->name }}</div>
+                                                    <div class="text-[10px] text-slate-400 font-bold">ID: {{ $loan->id }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="flex items-center gap-3">
+                                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 rounded-lg text-indigo-600 text-[10px] font-black">{{ $loan->jumlah }}x</span>
+                                                <span class="font-bold text-slate-800 text-sm">{{ $loan->alat->nama_alat }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="text-sm font-bold text-slate-800">{{ \Carbon\Carbon::parse($loan->tgl_pinjam)->format('d M Y') }}</div>
+                                            <div class="text-[10px] text-slate-400 font-bold">{{ \Carbon\Carbon::parse($loan->tgl_pinjam)->format('H:i') }}</div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="text-sm font-bold text-slate-800">
+                                                @if($loan->tgl_kembali_real)
+                                                    {{ \Carbon\Carbon::parse($loan->tgl_kembali_real)->format('d M Y') }}
+                                                    <div class="text-[10px] text-slate-400 font-bold">{{ \Carbon\Carbon::parse($loan->tgl_kembali_real)->format('H:i') }}</div>
+                                                @else
+                                                    <span class="text-slate-400">Belum Kembali</span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <div class="font-black text-rose-600 text-sm">Rp{{ number_format($loan->denda, 0, ',', '.') }}</div>
+                                            <div class="text-[10px] text-slate-400 font-bold">
+                                                @if($loan->denda > 0)
+                                                    Terlambat
+                                                @else
+                                                    Tepat Waktu
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="px-8 py-6">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest
+                                                {{ $loan->status == 'borrowed' ? 'bg-indigo-50 text-indigo-600' : '' }}
+                                                {{ $loan->status == 'returned' ? 'bg-emerald-50 text-emerald-600' : '' }}
+                                            ">
+                                                {{ str_replace('_', ' ', $loan->status) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-8 py-12 text-center text-slate-400 italic font-medium">Data tidak ditemukan</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6 no-print">
+                        {{ $loans->links() }}
                     </div>
                 </main>
             </div>

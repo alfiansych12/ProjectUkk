@@ -7,9 +7,15 @@ use Illuminate\Http\Request;
 
 class ActivityLogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $logs = AktivitasLog::with('user')->latest()->paginate(20);
+        $perPage = $request->query('per_page', 5);
+        $allowedPerPage = [5, 10, 15, 20];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+        
+        $logs = AktivitasLog::with('user')->latest()->paginate($perPage)->appends(['per_page' => $perPage]);
         return view('admin.log', compact('logs'));
     }
 }

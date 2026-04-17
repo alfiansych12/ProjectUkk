@@ -13,12 +13,18 @@ class AlatController extends Controller
 {
     public function index(Request $request)
     {
+        $perPage = $request->query('per_page', 5);
+        $allowedPerPage = [5, 10, 15, 20];
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+        
         $query = Alat::with('kategori');
         if ($request->has('kategori_id') && $request->kategori_id) {
             $query->where('kategori_id', $request->kategori_id);
         }
 
-        $alats = $query->latest()->paginate(12);
+        $alats = $query->latest()->paginate($perPage)->appends(['per_page' => $perPage] + $request->query());
         $kategoris = Kategori::all();
 
         if (Auth::user()->role === 'admin') {
@@ -30,14 +36,22 @@ class AlatController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'nama_alat' => 'required',
             'stok' => 'required|integer',
             'harga_sewa_per_hari' => 'required|numeric',
             'denda_per_hari' => 'required|numeric',
             'kategori_id' => 'required|exists:kategoris,id',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096'
+            'images' => 'nullable',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096'
         ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return back()->withErrors($validator)->withInput();
+        }
 
         $data = $request->except('images');
         $imagePaths = [];
@@ -47,29 +61,50 @@ class AlatController extends Controller
             if (!file_exists($uploadDir))
                 mkdir($uploadDir, 0755, true);
 
-            foreach ($request->file('images') as $image) {
-                $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
-                $image->move($uploadDir, $filename);
-                $imagePaths[] = 'uploads/alats/' . $filename;
+            $images = $request->file('images');
+            // Ensure it's an array even if single file
+            if (!is_array($images) && $images) {
+                $images = [$images];
+            }
+            
+            if (is_array($images)) {
+                foreach ($images as $image) {
+                    if ($image && $image->isValid()) {
+                        $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+                        $image->move($uploadDir, $filename);
+                        $imagePaths[] = 'uploads/alats/' . $filename;
+                    }
+                }
             }
         }
 
         $data['images'] = $imagePaths;
         Alat::create($data);
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Alat berhasil ditambahkan']);
+        }
         return back()->with('success', 'Alat berhasil ditambahkan');
     }
 
     public function update(Request $request, Alat $alat)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'nama_alat' => 'required',
             'stok' => 'required|integer',
             'harga_sewa_per_hari' => 'required|numeric',
             'denda_per_hari' => 'required|numeric',
             'kategori_id' => 'required|exists:kategoris,id',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096'
+            'images' => 'nullable',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096'
         ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            return back()->withErrors($validator)->withInput();
+        }
 
         $data = $request->except(['images', 'existing_images']);
 
@@ -105,16 +140,29 @@ class AlatController extends Controller
                 mkdir($uploadDir, 0777, true);
             }
 
-            foreach ($request->file('images') as $image) {
-                $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
-                $image->move($uploadDir, $filename);
-                $imagePaths[] = 'uploads/alats/' . $filename;
+            $images = $request->file('images');
+            // Ensure it's an array even if single file
+            if (!is_array($images) && $images) {
+                $images = [$images];
+            }
+            
+            if (is_array($images)) {
+                foreach ($images as $image) {
+                    if ($image && $image->isValid()) {
+                        $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+                        $image->move($uploadDir, $filename);
+                        $imagePaths[] = 'uploads/alats/' . $filename;
+                    }
+                }
             }
         }
 
         $data['images'] = $imagePaths;
         $alat->update($data);
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Alat berhasil diperbarui']);
+        }
         return back()->with('success', 'Alat berhasil diperbarui');
     }
 

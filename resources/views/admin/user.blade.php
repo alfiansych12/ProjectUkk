@@ -112,7 +112,103 @@
             </aside>
 
             <!-- Main Content -->
-            <div class="flex-1 flex flex-col min-w-0 overflow-hidden" x-data="{ addModal: false, editModal: false, editData: {id: null, name: '', username: '', email: '', role: ''} }">
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden" x-data="{ 
+                addModal: false, 
+                editModal: false, 
+                addSubmitting: false, 
+                editSubmitting: false, 
+                addError: false,
+                addErrors: [],
+                editError: false,
+                editErrors: [],
+                addFormData: {name: '', username: '', phone: '', role: 'peminjam', password: ''},
+                editData: {id: null, name: '', username: '', phone: '', role: ''},
+                submitAddForm() {
+                    this.addSubmitting = true;
+                    this.addError = false;
+                    this.addErrors = [];
+                    
+                    const formData = new FormData();
+                    formData.append('_token', document.querySelector('meta[name=csrf-token]').content);
+                    formData.append('name', this.addFormData.name);
+                    formData.append('username', this.addFormData.username);
+                    formData.append('phone', this.addFormData.phone);
+                    formData.append('role', this.addFormData.role);
+                    formData.append('password', this.addFormData.password);
+                    
+                    fetch('{{ route('admin.users.store') }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.errors) {
+                            this.addErrors = Object.values(data.errors).flat();
+                            this.addError = true;
+                            this.addSubmitting = false;
+                        } else {
+                            this.addModal = false;
+                            this.addFormData = {name: '', username: '', phone: '', role: 'peminjam', password: ''};
+                            // Reload page to see new user
+                            setTimeout(() => location.reload(), 300);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.addErrors = ['Terjadi kesalahan. Silakan coba lagi.'];
+                        this.addError = true;
+                        this.addSubmitting = false;
+                    });
+                },
+                submitEditForm() {
+                    this.editSubmitting = true;
+                    this.editError = false;
+                    this.editErrors = [];
+                    
+                    const formData = new FormData();
+                    formData.append('_token', document.querySelector('meta[name=csrf-token]').content);
+                    formData.append('_method', 'PUT');
+                    formData.append('name', this.editData.name);
+                    formData.append('username', this.editData.username);
+                    formData.append('phone', this.editData.phone);
+                    formData.append('role', this.editData.role);
+                    
+                    // Get password from form if provided
+                    const passwordInput = document.querySelector('input[name=password]');
+                    if (passwordInput && passwordInput.value) {
+                        formData.append('password', passwordInput.value);
+                    }
+                    
+                    fetch('/admin/users/' + this.editData.id, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.errors) {
+                            this.editErrors = Object.values(data.errors).flat();
+                            this.editError = true;
+                            this.editSubmitting = false;
+                        } else {
+                            this.editModal = false;
+                            // Reload page to see updated user
+                            setTimeout(() => location.reload(), 300);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.editErrors = ['Terjadi kesalahan. Silakan coba lagi.'];
+                        this.editError = true;
+                        this.editSubmitting = false;
+                    });
+                }
+            }">
                 <!-- Mobile Top Nav -->
                 <header class="lg:hidden bg-white border-b border-slate-100 p-4 flex justify-between items-center">
                    <div class="flex items-center gap-2">
@@ -148,7 +244,7 @@
                         <table class="w-full text-left">
                             <thead>
                                 <tr class="bg-slate-50/50 border-b border-slate-100">
-                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama / Email</th>
+                                    <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Nama / Handphone</th>
                                     <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Username</th>
                                     <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role</th>
                                     <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Aksi</th>
@@ -164,7 +260,7 @@
                                                 </div>
                                                 <div>
                                                     <p class="font-black text-slate-800 text-sm tracking-tight">{{ $user->name }}</p>
-                                                    <p class="text-[10px] font-bold text-slate-400">{{ $user->email }}</p>
+                                                    <p class="text-[10px] font-bold text-slate-400">{{ $user->phone }}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -180,7 +276,7 @@
                                         </td>
                                         <td class="px-8 py-6 text-right">
                                             <div class="flex items-center justify-end gap-2">
-                                                <button @click="editData = {id: {{ $user->id }}, name: '{{ $user->name }}', username: '{{ $user->username }}', email: '{{ $user->email }}', role: '{{ $user->role }}'}; editModal = true" class="w-9 h-9 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-indigo-500 hover:text-white transition-all shadow-sm">
+                                                <button @click="editData = {id: {{ $user->id }}, name: '{{ $user->name }}', username: '{{ $user->username }}', phone: '{{ $user->phone }}', role: '{{ $user->role }}'}; editModal = true" class="w-9 h-9 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl hover:bg-indigo-500 hover:text-white transition-all shadow-sm">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                                 </button>
                                                 @if($user->id !== Auth::id())
@@ -197,12 +293,31 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
-                    @if($users->hasPages())
-                        <div class="mt-4">
-                            {{ $users->links() }}
+
+                        <!-- Row Filter Section -->
+                        <div class="border-t border-slate-100 bg-slate-50/50 px-8 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold text-slate-600">Tampilkan:</span>
+                                @php
+                                    $currentPerPage = request()->query('per_page', 5);
+                                @endphp
+                                <select onchange="window.location.href='{{ route('admin.users.index') }}?per_page=' + this.value" 
+                                        class="px-6 py-1.5 pr-10 rounded-lg text-sm font-semibold border border-slate-200 bg-white text-slate-600 focus:border-indigo-500 focus:ring-indigo-500 cursor-pointer appearance-none bg-no-repeat bg-right"
+                                        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2364748b%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22></path></svg>'); background-position: right 8px center; background-size: 20px;">
+                                    <option value="5" {{ $currentPerPage == 5 ? 'selected' : '' }}>5</option>
+                                    <option value="10" {{ $currentPerPage == 10 ? 'selected' : '' }}>10</option>
+                                    <option value="15" {{ $currentPerPage == 15 ? 'selected' : '' }}>15</option>
+                                    <option value="20" {{ $currentPerPage == 20 ? 'selected' : '' }}>20</option>
+                                </select>
+                                <span class="text-sm text-slate-500">Baris</span>
+                            </div>
+                            @if($users->hasPages())
+                                <div class="flex items-center gap-4 pl-8">
+                                    {{ $users->appends(request()->query())->links() }}
+                                </div>
+                            @endif
                         </div>
-                    @endif
+                    </div>
                 </main>
 
                 {{-- MODAL ADD --}}
@@ -211,37 +326,51 @@
                         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="addModal = false"></div>
                         <div class="relative w-full max-w-lg bg-white rounded-lg p-8 shadow-2xl animate-in zoom-in duration-200">
                             <h3 class="text-xl font-bold text-slate-800 mb-6">Tambah User Baru</h3>
-                            <form action="{{ route('admin.users.store') }}" method="POST">
+                            <form @submit.prevent="submitAddForm" x-ref="addForm">
                                 @csrf
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Nama Lengkap</label>
-                                        <input type="text" name="name" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <input type="text" name="name" x-model="addFormData.name" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="addSubmitting">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Username</label>
-                                        <input type="text" name="username" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <input type="text" name="username" x-model="addFormData.username" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="addSubmitting">
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
-                                        <input type="email" name="email" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Nomor Handphone</label>
+                                        <input type="tel" name="phone" x-model="addFormData.phone" placeholder="08123456789" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="addSubmitting">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Role</label>
-                                        <select name="role" class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <select name="role" x-model="addFormData.role" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="addSubmitting">
                                             <option value="peminjam">Peminjam</option>
                                             <option value="petugas">Petugas</option>
                                             <option value="admin">Admin</option>
                                         </select>
                                     </div>
-                                    <div class="col-span-2">
+                                    <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Password</label>
-                                        <input type="password" name="password" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <input type="password" name="password" x-model="addFormData.password" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="addSubmitting">
                                     </div>
                                 </div>
+                                <div x-show="addError" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg" x-transition>
+                                    <p class="text-sm font-bold text-red-700 mb-2">Ada kesalahan:</p>
+                                    <ul class="text-sm text-red-600 space-y-1">
+                                        <template x-for="error in addErrors" :key="error">
+                                            <li x-text="'• ' + error"></li>
+                                        </template>
+                                    </ul>
+                                </div>
                                 <div class="flex gap-3 mt-8">
-                                    <button type="button" @click="addModal = false" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Batal</button>
-                                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition">Simpan</button>
+                                    <button type="button" @click="addModal = false" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition" :disabled="addSubmitting">Batal</button>
+                                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition disabled:opacity-50" :disabled="addSubmitting">
+                                        <span x-show="!addSubmitting">Simpan</span>
+                                        <span x-show="addSubmitting" class="inline-flex items-center gap-2">
+                                            <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Menyimpan...
+                                        </span>
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -254,37 +383,51 @@
                         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="editModal = false"></div>
                         <div class="relative w-full max-w-lg bg-white rounded-lg p-8 shadow-2xl animate-in zoom-in duration-200">
                             <h3 class="text-xl font-bold text-slate-800 mb-6">Edit User</h3>
-                            <form :action="'/admin/users/' + editData.id" method="POST">
+                            <form @submit.prevent="submitEditForm" x-ref="editForm">
                                 @csrf @method('PUT')
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Nama Lengkap</label>
-                                        <input type="text" name="name" :value="editData.name" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <input type="text" name="name" x-model="editData.name" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="editSubmitting">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Username</label>
-                                        <input type="text" name="username" :value="editData.username" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <input type="text" name="username" x-model="editData.username" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="editSubmitting">
                                     </div>
-                                    <div>
-                                        <label class="block text-sm font-bold text-slate-700 mb-2">Email</label>
-                                        <input type="email" name="email" :value="editData.email" required class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                    <div class="col-span-2">
+                                        <label class="block text-sm font-bold text-slate-700 mb-2">Nomor Handphone</label>
+                                        <input type="tel" name="phone" x-model="editData.phone" placeholder="08123456789" required class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="editSubmitting">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Role</label>
-                                        <select name="role" :value="editData.role" class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <select name="role" x-model="editData.role" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="editSubmitting">
                                             <option value="peminjam">Peminjam</option>
                                             <option value="petugas">Petugas</option>
                                             <option value="admin">Admin</option>
                                         </select>
                                     </div>
-                                    <div class="col-span-2">
+                                    <div>
                                         <label class="block text-sm font-bold text-slate-700 mb-2">Password (Kosongkan jika tidak diubah)</label>
-                                        <input type="password" name="password" class="w-full rounded-xl border-slate-200 focus:ring-indigo-500">
+                                        <input type="password" name="password" class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition" :disabled="editSubmitting">
                                     </div>
                                 </div>
+                                <div x-show="editError" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg" x-transition>
+                                    <p class="text-sm font-bold text-red-700 mb-2">Ada kesalahan:</p>
+                                    <ul class="text-sm text-red-600 space-y-1">
+                                        <template x-for="error in editErrors" :key="error">
+                                            <li x-text="'• ' + error"></li>
+                                        </template>
+                                    </ul>
+                                </div>
                                 <div class="flex gap-3 mt-8">
-                                    <button type="button" @click="editModal = false" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Batal</button>
-                                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition">Simpan Perubahan</button>
+                                    <button type="button" @click="editModal = false" class="flex-1 py-3 px-4 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition" :disabled="editSubmitting">Batal</button>
+                                    <button type="submit" class="flex-1 py-3 px-4 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 transition disabled:opacity-50" :disabled="editSubmitting">
+                                        <span x-show="!editSubmitting">Simpan Perubahan</span>
+                                        <span x-show="editSubmitting" class="inline-flex items-center gap-2">
+                                            <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Menyimpan...
+                                        </span>
+                                    </button>
                                 </div>
                             </form>
                         </div>

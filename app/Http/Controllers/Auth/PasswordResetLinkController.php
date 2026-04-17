@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\FormatPhoneTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +15,7 @@ use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
 {
+    use FormatPhoneTrait;
     /**
      * Display the password reset link request view.
      */
@@ -112,18 +114,5 @@ class PasswordResetLinkController extends Controller
             \Log::error('Fonnte OTP Reset Password Error', ['error' => $e->getMessage()]);
             return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
         }
-    }
-
-    private function formatWhatsApp($number)
-    {
-        $whatsapp = preg_replace('/\D+/', '', $number);
-        if (str_starts_with($whatsapp, '0')) {
-            $whatsapp = '62' . substr($whatsapp, 1);
-        } elseif (str_starts_with($whatsapp, '620')) {
-            $whatsapp = '62' . substr($whatsapp, 3);
-        } elseif (!str_starts_with($whatsapp, '62')) {
-            $whatsapp = '62' . $whatsapp;
-        }
-        return $whatsapp;
     }
 }
