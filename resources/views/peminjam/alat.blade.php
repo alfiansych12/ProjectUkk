@@ -241,9 +241,6 @@
                                         </div>
                         @endforeach
                     </div>
-                    <div class="mt-12">
-                        {{ $alats->links() }}
-                    </div>
                 @endif
             </main>
         </div>

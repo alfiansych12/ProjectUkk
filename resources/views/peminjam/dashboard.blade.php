@@ -104,16 +104,16 @@
             </nav>
 
             <div class="pt-6 border-t border-slate-50 space-y-4">
-                <div class="glass-card p-4 flex items-center gap-3">
+                <a href="{{ route('profile.edit') }}" class="block glass-card p-4 flex items-center gap-3 hover:bg-indigo-50 transition-all duration-200 rounded-2xl group">
                     <div
-                        class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700">
+                        class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700 group-hover:bg-indigo-200 group-hover:text-indigo-800 transition-all">
                         {{ substr(Auth::user()->name, 0, 1) }}
                     </div>
                     <div class="truncate">
                         <div class="text-sm font-bold text-slate-800 truncate">{{ Auth::user()->name }}</div>
                         <div class="text-[10px] font-bold text-slate-400 uppercase">{{ Auth::user()->role }}</div>
                     </div>
-                </div>
+                </a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

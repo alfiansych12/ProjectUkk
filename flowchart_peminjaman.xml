@@ -1,0 +1,28 @@
+<mxfile host="app.diagrams.net" modified="2026-04-18T00:00:00.000Z" agent="GitHub Copilot" version="22.1.0" type="device">
+  <diagram name="Flowchart Peminjaman Alat" id="peminjaman-flow">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="700" pageHeight="600" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="start" value="Mulai" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="280" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="akses" value="Peminjam membuka&#xa;halaman Cari Alat" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="260" y="80" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="tampil" value="Tampilkan&#xa;daftar alat yang tersedia" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="260" y="150" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="pilih" value="Peminjam pilih alat,&#xa;jumlah, tgl kembali" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="240" y="220" width="200" height="50" as="geometry"/></mxCell>
+        <mxCell id="cek-stok" value="Cek stok alat&#xa;Apakah stok mencukupi?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="240" y="290" width="200" height="70" as="geometry"/></mxCell>
+        <mxCell id="stok-tidak" value="Stok tidak mencukupi&#xa;Proses dibatalkan" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="40" y="380" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="buat" value="Buat data peminjaman&#xa;Status: Menunggu Persetujuan" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="240" y="380" width="200" height="50" as="geometry"/></mxCell>
+        <mxCell id="notif" value="Tampilkan pesan&#xa;'Menunggu Persetujuan'" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="240" y="450" width="200" height="50" as="geometry"/></mxCell>
+        <mxCell id="end" value="Selesai" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="280" y="520" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="start" target="akses"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="akses" target="tampil"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="tampil" target="pilih"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="pilih" target="cek-stok"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="cek-stok" target="stok-tidak"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="Ya" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="cek-stok" target="buat"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="stok-tidak" target="end"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="buat" target="notif"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="notif" target="end"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

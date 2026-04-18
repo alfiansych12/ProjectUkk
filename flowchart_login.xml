@@ -1,0 +1,41 @@
+<mxfile host="app.diagrams.net" modified="2026-04-18T00:00:00.000Z" agent="GitHub Copilot" version="22.1.0" type="device">
+  <diagram name="Flowchart Login" id="login-flow">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="700" pageHeight="650" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="start" value="Mulai" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="280" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="input" value="User input&#xa;Email/Username/WhatsApp&#xa;Password" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="260" y="80" width="160" height="60" as="geometry"/></mxCell>
+        <mxCell id="cek-rate" value="Cek batas percobaan&#xa;(max 5 kali)?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="250" y="160" width="180" height="60" as="geometry"/></mxCell>
+        <mxCell id="terblokir" value="Terblokir&#xa;(coba lagi nanti)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="40" y="240" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="validasi" value="Validasi&#xa;akun di database?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="250" y="240" width="180" height="60" as="geometry"/></mxCell>
+        <mxCell id="gagal" value="Login gagal&#xa;Tampilkan error" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="40" y="320" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="berhasil" value="Berhasil login&#xa;Buat session" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="260" y="320" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="redirect" value="Redirect ke&#xa;/dashboard" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="260" y="390" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="tampil-role" value="Tampilkan dashboard&#xa;sesuai role user?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="250" y="460" width="180" height="60" as="geometry"/></mxCell>
+        <mxCell id="admin" value="Admin:&#xa;Kelola User, Alat, Kategori" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="40" y="540" width="140" height="50" as="geometry"/></mxCell>
+        <mxCell id="petugas" value="Petugas:&#xa;Kelola Peminjaman" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="260" y="540" width="140" height="50" as="geometry"/></mxCell>
+        <mxCell id="peminjam" value="Peminjam:&#xa;Pinjam Alat, Riwayat" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="480" y="540" width="140" height="50" as="geometry"/></mxCell>
+        <mxCell id="logout" value="Logout" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="280" y="610" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="end" value="Selesai" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="280" y="670" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="start" target="input"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="input" target="cek-rate"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="Ya" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="cek-rate" target="terblokir"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="cek-rate" target="validasi"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="terblokir" target="input"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="Salah" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="validasi" target="gagal"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="Benar" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="validasi" target="berhasil"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="gagal" target="input"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="berhasil" target="redirect"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="redirect" target="tampil-role"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" value="admin" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="tampil-role" target="admin"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" value="petugas" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="tampil-role" target="petugas"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" value="peminjam" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="tampil-role" target="peminjam"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="admin" target="logout"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="petugas" target="logout"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="peminjam" target="logout"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="logout" target="end"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

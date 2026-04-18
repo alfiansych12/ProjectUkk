@@ -88,44 +88,76 @@
                     @endif
                 </nav>
 
-                <div class="pt-6 border-t border-slate-50">
-                    <div class="glass-card p-4 flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700">
+                <div class="pt-6 border-t border-slate-50 space-y-4">
+                    <a href="{{ route('profile.edit') }}" class="block glass-card p-4 flex items-center gap-3 hover:bg-indigo-50 transition-all duration-200 rounded-2xl group">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-700 group-hover:bg-indigo-200 group-hover:text-indigo-800 transition-all">
                             {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
                         <div class="truncate">
                             <div class="text-sm font-bold text-slate-800 truncate">{{ Auth::user()->name }}</div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase">{{ Auth::user()->role }}</div>
                         </div>
-                    </div>
+                    </a>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-2xl transition-all duration-200 group">
+                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span class="font-bold text-sm">Keluar</span>
+                        </button>
+                    </form>
                 </div>
             </aside>
 
             <!-- Main Content -->
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+                <!-- Mobile Top Nav -->
+                <header class="lg:hidden bg-white border-b border-slate-100 p-4 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <svg viewBox="0 0 24 24" fill="none" class="w-5 h-5 text-white" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3a1 1 0 011-1h1a2 2 0 100-4h-1a1 1 0 01-1-1V7a1 1 0 011-1h3a1 1 0 011 1v1a2 2 0 11-4 0V4z" />
+                            </svg>
+                        </div>
+                        <span class="font-bold text-slate-800">PinjamAlat</span>
+                    </div>
+                    <!-- Authentication -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="text-slate-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        </button>
+                    </form>
+                </header>
+
                 <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none p-4 md:p-8">
-                    <div class="mb-8">
-                        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                            {{ __('Profile Settings') }}
-                        </h2>
+                    <div class="mb-10 flex items-end justify-between">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Pengaturan Profil</h2>
+                            <p class="text-slate-400 text-sm mt-1 font-medium">Kelola informasi akun dan keamanan Anda.</p>
+                        </div>
                     </div>
 
-                    <div class="max-w-7xl mx-auto space-y-6">
-                        <div class="p-4 sm:p-8 bg-white shadow-sm border border-slate-100 sm:rounded-[2rem]">
-                            <div class="max-w-xl">
-                                @include('profile.partials.update-profile-information-form')
+                    <div class="max-w-7xl mx-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-4 sm:p-8 bg-white shadow-sm border border-slate-100 sm:rounded-[2rem]">
+                                <div class="max-w-xl">
+                                    @include('profile.partials.update-profile-information-form')
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="p-4 sm:p-8 bg-white shadow-sm border border-slate-100 sm:rounded-[2rem]">
-                            <div class="max-w-xl">
-                                @include('profile.partials.update-password-form')
+                            <div class="p-4 sm:p-8 bg-white shadow-sm border border-slate-100 sm:rounded-[2rem]">
+                                <div class="max-w-xl">
+                                    @include('profile.partials.update-password-form')
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="p-4 sm:p-8 bg-white shadow-sm border border-slate-100 sm:rounded-[2rem]">
-                            <div class="max-w-xl">
-                                @include('profile.partials.delete-user-form')
+                            <div class="p-4 sm:p-8 bg-white shadow-sm border border-slate-100 sm:rounded-[2rem] md:col-span-2">
+                                <div class="max-w-xl">
+                                    @include('profile.partials.delete-user-form')
+                                </div>
                             </div>
                         </div>
                     </div>

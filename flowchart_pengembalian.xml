@@ -1,0 +1,42 @@
+<mxfile host="app.diagrams.net" modified="2026-04-18T00:00:00.000Z" agent="GitHub Copilot" version="22.1.0" type="device">
+  <diagram name="Flowchart Pengembalian Alat &amp; Perhitungan Denda" id="pengembalian-denda-flow">
+    <mxGraphModel dx="1000" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="start" value="Mulai" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="360" y="20" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="ajuan" value="Peminjam klik&#xa;'Ajukan Pengembalian'" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="80" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="status" value="Status berubah&#xa;menunggu_pengembalian" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="150" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="akses" value="Petugas membuka&#xa;menu Kelola Peminjaman" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="220" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="pilih" value="Petugas pilih&#xa;peminjaman yang dikembalikan" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="290" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="modal" value="Petugas input&#xa;tanggal pengembalian" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="360" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="proses" value="Petugas klik&#xa;'Proses Pengembalian'" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="430" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="cek-denda" value="Apakah tgl kembali&#xa;melebihi tgl rencana?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="320" y="500" width="200" height="60" as="geometry"/></mxCell>
+        <mxCell id="tidak-telat" value="Tidak telat&#xa;Denda = Rp 0" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="560" y="510" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="hitung-hari" value="Hitung&#xa;hari keterlambatan" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="580" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="ambil-tarif" value="Ambil tarif&#xa;denda per hari" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="140" y="650" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="hitung-total" value="Hitung total denda:&#xa;Hari x Tarif x Jumlah" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="120" y="720" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="stok" value="Tambah stok alat&#xa;(alat dikembalikan)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="580" width="160" height="50" as="geometry"/></mxCell>
+        <mxCell id="simpan" value="Simpan data pengembalian&#xa;Update status = returned" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="650" width="180" height="50" as="geometry"/></mxCell>
+        <mxCell id="notif" value="Kirim WhatsApp&#xa;ke peminjam&#xa;(jika ada denda)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="340" y="720" width="160" height="60" as="geometry"/></mxCell>
+        <mxCell id="end" value="Selesai" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="360" y="800" width="120" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="start" target="ajuan"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="ajuan" target="status"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="status" target="akses"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="akses" target="pilih"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="pilih" target="modal"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="modal" target="proses"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="proses" target="cek-denda"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" value="Tidak" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="cek-denda" target="tidak-telat"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" value="Ya" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="cek-denda" target="hitung-hari"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="tidak-telat" target="stok"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="hitung-hari" target="ambil-tarif"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="ambil-tarif" target="hitung-total"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="hitung-total" target="stok"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="stok" target="simpan"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="simpan" target="notif"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="notif" target="end"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

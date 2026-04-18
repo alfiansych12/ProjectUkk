@@ -20,6 +20,12 @@ class AlatController extends Controller
         }
         
         $query = Alat::with('kategori');
+        
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $query->where('nama_alat', 'like', '%' . $request->search . '%');
+        }
+        
         if ($request->has('kategori_id') && $request->kategori_id) {
             $query->where('kategori_id', $request->kategori_id);
         }

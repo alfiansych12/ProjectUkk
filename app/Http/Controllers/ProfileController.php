@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Traits\FormatPhoneTrait;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    use FormatPhoneTrait;
+    
     /**
      * Display the user's profile form.
      */
@@ -26,7 +29,15 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
+
+        // Format phone number if provided
+        if (!empty($validated['phone'])) {
+            $validated['phone'] = $this->formatWhatsApp($validated['phone']);
+        }
+
+        $user->fill($validated);
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
